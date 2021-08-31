@@ -3,13 +3,14 @@
 #
 Target=demo
 
-gen=generated
 
-generated_src:=$(wildcard $(gen)/*.cpp) 
+gen=generated
+gramma=$(gen)/libgramma.a 
+
 
 app_src:=$(wildcard *.cpp)
 
-all_src:= $(generated_src) $(app_src)
+all_src:= $(app_src)
 Objs:=$(patsubst %.cpp,%.o,$(all_src)) 
 
 antlr_root:=/home/szr/research/antlr/cpp-runtime/usr/local
@@ -53,9 +54,11 @@ all:$(Target)
 
 -include $(Deps)
 
-demo: $(Objs)
-	$(CC) $^ $(LDFLAGS)  $(LOADLIBES) $(LDLIBS) -o $@
+demo:$(gramma) $(Objs)
+	$(CC) $(Objs) $(gramma) $(LDFLAGS)  $(LOADLIBES) $(LDLIBS) -o $@
 
+$(gramma):
+	cd gramma;./generate.sh
 
 YCM:
 	make clean
@@ -63,7 +66,7 @@ YCM:
 	compiledb -p build.log
 
 clean:
-	rm -fr $(Objs) $(Target) $(Deps) $(gen)
+	rm -fr $(Objs) $(Target) $(Deps) $(gen) gramma/*.o
 
 test:demo
 	./demo
